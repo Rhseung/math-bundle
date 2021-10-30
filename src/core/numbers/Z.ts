@@ -54,7 +54,7 @@ export class Z implements IZ {
   toString (): string {
     let r = '';
     this.ns.forEach(e => r = e + r);
-    return r.replace(/\B(?=(\d{3})+(?!\d))/g, SEPARATOR);
+    return ((this.sign > 0) ? '+' : '-') + r.replace(/\B(?=(\d{3})+(?!\d))/g, SEPARATOR);
   }
 
   isPositive (): boolean {
@@ -70,8 +70,8 @@ export class Z implements IZ {
   }
 
   add (z: Z): Z {
-    if (this.isPositive() && z.isNegative()) return this.sub(z);
-    if (this.isNegative() && z.isPositive()) return z.sub(this);
+    if (this.isPositive() && z.isNegative()) return this.sub(z.negate());
+    if (this.isNegative() && z.isPositive()) return z.sub(this.negate());
     
     let a, b;
     if (this.ns.length < z.ns.length) [a, b] = [z.ns, this.ns];
@@ -98,14 +98,12 @@ export class Z implements IZ {
   
     if (carry > 0) r.push(carry);
     
-    console.log(r);
-    
     return new Z(r, this.sign);
   }
   
   sub (z: Z): Z {
-    if (this.isPositive() && z.isNegative()) return this.add(z);
-    if (this.isNegative() && z.isPositive()) return z.add(this);
+    if (this.isPositive() && z.isNegative()) return this.add(z.negate());
+    if (this.isNegative() && z.isPositive()) return z.add(this.negate());
 
     let a, b, sign;
     if (this.ns.length < z.ns.length) [a, b, sign] = [z.ns, this.ns, -1];
@@ -167,6 +165,9 @@ export class Z implements IZ {
   }
 }
 
-const z1 = new Z('1036129827349827349872348274');
-const z2 = new Z('982349872349872349839184');
-console.log(`a = ${z1.toString()}\nb = ${z2.toString()}\na - b = ${z1.sub(z2).toString()}`);
+// FIXME (-1) - (-3) 오류남
+const z1 = new Z('1', -1);
+const z2 = new Z('3', -1);
+console.log(z1.toString());
+console.log(z2.toString());
+console.log(z1.sub(z2).toString());

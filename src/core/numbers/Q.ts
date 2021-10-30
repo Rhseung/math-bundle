@@ -1,63 +1,30 @@
+// TODO 모든 number => Z 로 바꿔
 import { Z } from './Z';
 
 interface IQ {
-  /* 분자 */
   numerator: number,
-
-  /* 분모 */
   denominator: number,
-
-  /* 부호 */
   sign: number,
 
-  /* 간단하게 표현 */
   toString(isMixed?: boolean): string,
-
-  /* 더 예쁘게 표현 */
   toBeautifyString(isJoin?: boolean): (string[] | string),
-
-  /* 연분수로 표현 */
   toContinuedFraction(): string,
-
-  /* 근사값 */
   value(): number,
-
-  /* 역수 */
   inverse(): Q,
-
-  /* 부호 바꾸기 */
   negate(): Q,
-
-  /* 일치 비교 */
   isEqual(q: Q): boolean,
-
-  /* 큰지 비교 */
   isBigger(q: Q): boolean,
-
-  /* 작은지 비교 */
   isSmaller(q: Q): boolean,
-
-  /* 덧셈 */
   add(q: Q): Q,
-
-  /* 뺄셈 */
   sub(q: Q): Q,
-
-  /* 곱셈 */
   mul(q: Q): Q,
-
-  /* 나눗셈 */
   div(q: Q): Q,
-
-  /* 나머지 */
   mod(q: Q): Q,
-
-  /* 거듭제곱 */
   pow(z: Z): Q
 }
 
-const basic_gcd = (a: number, b: number): number => (!b) ? a : basic_gcd(b, a % b);
-const basic_lcm = (a: number, b: number): number => a * b / basic_gcd(a, b);
+const base_gcd = (a: number, b: number): number => (!b) ? a : base_gcd(b, a % b);
+const base_lcm = (a: number, b: number): number => a * b / base_gcd(a, b);
 const toMonospace = (s: string): string => s
   .replace(/0/g, '𝟶')
   .replace(/1/g, '𝟷')
@@ -80,7 +47,7 @@ export class Q implements IQ {
     this.numerator = Math.abs(numerator) * (((numerator * denominator) > 0) ? 1 : -1);
     this.denominator = Math.abs(denominator);
 
-    let gcdOfND: number = basic_gcd(Math.abs(this.numerator), Math.abs(this.denominator));
+    let gcdOfND: number = base_gcd(Math.abs(this.numerator), Math.abs(this.denominator));
     this.numerator /= gcdOfND; this.denominator /= gcdOfND;
   }
 
@@ -131,17 +98,17 @@ export class Q implements IQ {
   };
 
   isBigger (q: Q): boolean {
-    let lcmOfDD = basic_lcm(this.denominator, q.denominator);
+    let lcmOfDD = base_lcm(this.denominator, q.denominator);
     return (this.numerator * (lcmOfDD / this.denominator)) > (q.numerator * (lcmOfDD / q.denominator));
   };
 
   isSmaller (q: Q): boolean {
-    let lcmOfDD = basic_lcm(this.denominator, q.denominator);
+    let lcmOfDD = base_lcm(this.denominator, q.denominator);
     return (this.numerator * (lcmOfDD / this.denominator)) < (q.numerator * (lcmOfDD / q.denominator));
   };
 
   add (q: Q): Q {
-    let lcmOfDD = basic_lcm(this.denominator, q.denominator);
+    let lcmOfDD = base_lcm(this.denominator, q.denominator);
     return new Q((this.numerator * (lcmOfDD / this.denominator)) + (q.numerator * (lcmOfDD / q.denominator)), lcmOfDD);
   };
 
@@ -158,7 +125,7 @@ export class Q implements IQ {
   };
 
   mod (q: Q): Q {
-    let lcmOfDD = basic_lcm(this.denominator, q.denominator);
+    let lcmOfDD = base_lcm(this.denominator, q.denominator);
     return new Q((this.numerator * (lcmOfDD / this.denominator)) % (q.numerator * (lcmOfDD / q.denominator)), lcmOfDD);
   };
 
@@ -167,6 +134,7 @@ export class Q implements IQ {
   };
 }
 
+// FIXME 순환소수 오류남
 function Rationalize (parse: (number | string)): Q {
   parse = (typeof parse != "string") ? String(parse) : parse;
 
