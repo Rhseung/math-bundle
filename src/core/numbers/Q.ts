@@ -25,17 +25,6 @@ interface IQ {
 
 const base_gcd = (a: number, b: number): number => (!b) ? a : base_gcd(b, a % b);
 const base_lcm = (a: number, b: number): number => a * b / base_gcd(a, b);
-const toMonospace = (s: string): string => s
-  .replace(/0/g, '𝟶')
-  .replace(/1/g, '𝟷')
-  .replace(/2/g, '2')
-  .replace(/3/g, '3')
-  .replace(/4/g, '4')
-  .replace(/5/g, '5')
-  .replace(/6/g, '6')
-  .replace(/7/g, '7')
-  .replace(/8/g, '8')
-  .replace(/9/g, '9');
 
 export class Q implements IQ {
   numerator: number;
@@ -70,9 +59,9 @@ export class Q implements IQ {
       lines[2] += '  ';
     }
 
-    lines[0] += toMonospace(String(Math.abs(this.numerator)));
+    lines[0] += String(Math.abs(this.numerator));
     lines[1] += '━'.repeat(Math.max(String(Math.abs(this.numerator)).length, String(Math.abs(this.denominator)).length));
-    lines[2] += toMonospace(String(Math.abs(this.denominator)));
+    lines[2] += String(Math.abs(this.denominator));
 
     return (isJoin) ? lines.join('\n') : lines;
   };
@@ -134,11 +123,10 @@ export class Q implements IQ {
   };
 }
 
-// FIXME 순환소수 오류남
-function Rationalize (parse: (number | string)): Q {
+function Rational (parse: (number | string)): Q {
   parse = (typeof parse != "string") ? String(parse) : parse;
 
-  const matched = (parse.match(/(-?\d+)(?:.(\d+)(?:'(\d+)')?)?/) || []).slice(1).map(e => e || '');
+  const matched = (parse.match(/(-?\d+)(?:\.(\d+)?(?:\[(\d+)\])?)?/) || []).slice(1).map(e => e || '');
   const FRONT = matched[0];
   const IN = matched[1];
   const REPEAT = matched[2] || '0';
@@ -149,5 +137,5 @@ function Rationalize (parse: (number | string)): Q {
   );
 }
 
-const q1: Q = Rationalize("0.'142857'");
+const q1: Q = Rational("0.[142857]");
 console.log(q1.toString());

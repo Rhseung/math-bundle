@@ -19,23 +19,24 @@ const SEPARATOR = ' ';
 var BASE = Math.pow(10, BASE_DIGIT);
 
 // TODO base N 구현 (base -N 도 가능해야함)
-// TODO sign 자동 추론 (속도 보고 결정해)
 export class Z implements IZ {
   sign: number;
-  ns: number[];
   base: number;
+  ns: number[];
 
-  constructor(number: (string | number | number[]), sign?: number, base?: number) {
-    this.sign = (sign == null) ? 1 : sign / Math.abs(sign);
-    this.base = (base == null) ? 10 : base; 
+  static minusOne: Z;
+  static zero: Z;
+  static one: Z;
 
-    BASE = Math.pow(this.base, BASE_DIGIT);
+  constructor(number: (string | number | number[]), sign: number, base: number) {
+    this.sign = sign;
+    this.base = base;
+    
+    BASE = Math.pow(base, BASE_DIGIT);
         
     if (typeof number == 'string' || typeof number == 'number') {
       if (Number(number) % 1 !== 0) throw new Error('Z() 인자에는 정수만 가능');
       if (typeof number == 'number') number = String(number);
-
-      number = number.replace(/ |\+|-/g, '');
 
       let chucks = new Array<string>();    
       while (number.length != 0) {
@@ -66,7 +67,7 @@ export class Z implements IZ {
   }
 
   negate (): Z {
-    return new Z(this.ns, -this.sign);
+    return new Z(this.ns, -this.sign, this.base);
   }
 
   add (z: Z): Z {
@@ -98,12 +99,13 @@ export class Z implements IZ {
   
     if (carry > 0) r.push(carry);
     
-    return new Z(r, this.sign);
+    return new Z(r, this.sign, this.base);
   }
   
   sub (z: Z): Z {
     if (this.isPositive() && z.isNegative()) return this.add(z.negate());
     if (this.isNegative() && z.isPositive()) return z.add(this.negate());
+    if (this.isNegative() && z.isNegative()) return z.negate().sub(this.negate());
 
     let a, b, sign;
     if (this.ns.length < z.ns.length) [a, b, sign] = [z.ns, this.ns, -1];
@@ -143,31 +145,47 @@ export class Z implements IZ {
       r[i] = a[i];
     }
 
-    return new Z(r, this.sign);
+    return new Z(r, this.sign, this.base);
   }
 
+
+  // TODO Karatsuba!!
   mul (z: Z): Z {
-    return new Z(1, +1);
+    return new Z(this.ns, this.sign, this.base);
   }
   
   div (z: Z): Z {
-    return new Z(1, +1);
+    return new Z(this.ns, this.sign, this.base);
   }
 
   mod (z: Z): Z {
-    return new Z(1, +1);
+    return new Z(this.ns, this.sign, this.base);
   }
 
   pow (n: Z): Z { 
-    if (n.sign < 0) return new Z(0);
+    if (n.sign < 0) return Z.zero;
     
-    return new Z(0);
+    return new Z(this.ns, this.sign, this.base);
   }
 }
+Z.minusOne = new Z(1, -1, 10);
+Z.zero = new Z(0, +1, 10);
+Z.one = new Z(1, +1, 10);
 
-// FIXME (-1) - (-3) 오류남
-const z1 = new Z('1', -1);
-const z2 = new Z('3', -1);
-console.log(z1.toString());
-console.log(z2.toString());
-console.log(z1.sub(z2).toString());
+function Integer (number: (number | string), base: number = 10): Z {
+  number = String(number);
+  
+  let sign = +1;
+  if (number.startsWith('+')) sign = +1;
+  if (number.startsWith('-')) sign = -1;
+      
+  number = number.replace(/^(\+|\-)/g, '').replace(/ |_/g, '');
+
+  return new Z(number, sign, base);
+}
+
+const z1: Z = Integer(1);
+const z2: Z = Integer(4);
+console.log(z1);
+console.log(z2);
+console.log(z1.add(z2).toString());
