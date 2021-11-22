@@ -1,7 +1,11 @@
-interface IVector {};
+interface IV {};
 
-class Vector implements IVector {
+class V implements IV {
   constructor() {}
 }
 
-// -
+function Vector () {
+  
+}
+
+// W = →F ∙ →s

@@ -31,7 +31,7 @@ export class Q implements IQ {
   denominator: number;
 
   constructor(numerator: number, denominator: number) {
-    if (denominator == 0) throw "Divide By Zero Error";
+    if (denominator == 0) throw new RangeError("Divide By Zero Error");
 
     this.numerator = Math.abs(numerator) * (((numerator * denominator) > 0) ? 1 : -1);
     this.denominator = Math.abs(denominator);

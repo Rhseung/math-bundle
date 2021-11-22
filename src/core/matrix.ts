@@ -1,12 +1,16 @@
-interface IMatrix {};
+interface IM {};
 
-class Matrix implements IMatrix {
+class M implements IM {
   constructor() {}
+}
+
+function Matrix () {
+  
 }
 
 const sin = (n: number) => Math.sin(n);
 
-let matrix = [
+let m = [
   1,       2, 3,
   sin(30), 8, 19,
   4,       5, 6722
