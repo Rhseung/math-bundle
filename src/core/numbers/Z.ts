@@ -45,8 +45,8 @@ interface IZ {
 }
 
 const SEPARATOR = ' ';
-const M = 7;
-var B = Math.pow(10, M);
+const D = 3;
+var B = 10 ** D;
 
 // TODO base N 구현 (base -N 도 가능해야함)
 export class Z implements IZ {
@@ -57,14 +57,14 @@ export class Z implements IZ {
   constructor(number: (string | number[]), sign: number, base: number) {
     this.sign = sign;
     this.base = base;
-    B = Math.pow(base, M);
+    B = base ** D;
 
     if (typeof number == 'string') {
       if (Number(number) % 1 !== 0) throw new Error('Z() 인자에는 정수만 가능');
 
       let chucks = new Array<string>();    
       while (number.length != 0) {
-        let chucklen: number = (number.length % M == 0) ? M : number.length % M;
+        let chucklen: number = (number.length % D == 0) ? D : number.length % D;
         chucks.push(number.slice(0, chucklen));
         number = number.slice(chucklen);
       }
@@ -96,7 +96,7 @@ export class Z implements IZ {
     if (this.sign != z.sign) return false;
     return z.cabinet.every((e, i) => e == this.cabinet[i]);
   }
-  eq = this.equals;
+  eq (z: Z): boolean { return this.equals(z); }
 
   greater (z: Z): boolean {
     if (this.isPositive() && z.isNegative()) return true;
@@ -112,7 +112,7 @@ export class Z implements IZ {
       return (this.negate()).lesser(z.negate());
     }
   }
-  gt = this.greater;
+  gt (z: Z): boolean { return this.greater(z) };
 
   lesser (z: Z): boolean {
     if (this.isPositive() && z.isNegative()) return false;
@@ -128,7 +128,7 @@ export class Z implements IZ {
       return (this.negate()).greater(z.negate());
     }
   }
-  lt = this.lesser;
+  lt (z: Z): boolean { return this.lesser(z) };
 
   geq (z: Z): boolean {
     if (this.isPositive() && z.isNegative()) return true;
@@ -144,7 +144,7 @@ export class Z implements IZ {
       return (this.negate()).leq(z.negate());
     }
   }
-  greaterOrEquals = this.geq;
+  greaterOrEquals (z: Z): boolean { return this.geq(z) };
 
   leq (z: Z): boolean {
     if (this.isPositive() && z.isNegative()) return false;
@@ -160,7 +160,7 @@ export class Z implements IZ {
       return (this.negate()).geq(z.negate());
     }
   }
-  lesserOrEquals = this.leq;
+  lesserOrEquals (z: Z): boolean { return this.leq(z) };
 
   negate (): Z {
     return new Z(this.cabinet, -this.sign, this.base);
@@ -202,7 +202,7 @@ export class Z implements IZ {
     
     return new Z(r, this.sign, this.base);
   }
-  plus = this.add;
+  plus (z: Z): Z { return this.add(z) };
   
   sub (z: Z): Z {
     if (this.isPositive() && z.isNegative()) return this.add(z.negate());
@@ -249,23 +249,34 @@ export class Z implements IZ {
 
     return new Z(r, this.sign, this.base);
   }
-  minus = this.sub;
+  minus (z: Z): Z { return this.sub(z) };
 
   // TODO Karatsuba!!
+ /*
+  * B = 10^D, D = 3
+  * 12345 = 12 * B^1 + 345 * B^0
+  * 6789 = 6 * B^1 + 789 * B^0
+  * 
+  * p = 12 * 6 = 72
+  * q = 345 * 789 = 272205
+  * r = (12 + 345) * (6 + 789) - (p + q) = 11538
+  * 
+  * 12345 * 6789 = p * B^2 + q * B^1 + r * B^0 = (72 + 272) * B^2 + (205 + 11) * B^1 + 538 * B^0
+  */
   mul (z: Z): Z {
     return new Z(this.cabinet, this.sign, this.base);
   }
-  times = this.mul;
+  times (z: Z): Z { return this.mul(z) };
   
   div (z: Z): Z {
     return new Z(this.cabinet, this.sign, this.base);
   }
-  divide = this.div;
+  divide (z: Z): Z { return this.div(z) };
 
   mod (z: Z): Z {
     return new Z(this.cabinet, this.sign, this.base);
   }
-  modulo = this.mod;
+  modulo (z: Z): Z { return this.mod(z) };
 
   // TODO
   pow (n: Z): (Z | RangeError) { 
@@ -273,7 +284,7 @@ export class Z implements IZ {
     
     return new Z(this.cabinet, this.sign, this.base);
   }
-  power = this.pow;
+  power (z: Z): (Z | RangeError) { return this.pow(z) };
 }
 
 function Integer (number: (number | string | Z), base: number = 10): Z {
@@ -289,9 +300,4 @@ function Integer (number: (number | string | Z), base: number = 10): Z {
   return new Z(number, sign, base);
 }
 
-const a = Integer(3);
-const e = Integer(2);
-const b = Integer(13);
-const c = Integer(-7);
-const d = Integer(0);
-console.log(Integer(3).add(Integer(7)).sub(Integer(8)).negate().toString());
+console.log(Integer(12345));
