@@ -261,7 +261,7 @@ export class Z implements IZ {
   * q = 345 * 789 = 272205
   * r = (12 + 345) * (6 + 789) - (p + q) = 11538
   * 
-  * 12345 * 6789 = p * B^2 + q * B^1 + r * B^0 = (72 + 272) * B^2 + (205 + 11) * B^1 + 538 * B^0
+  * 12345 * 6789 = p * B^2 + q * B^1 + r * B^0 = (72 + 272) * B^2 + (205 + 11) * B^1 + 538 * B^0 = 83810205
   */
   mul (z: Z): Z {
     return new Z(this.cabinet, this.sign, this.base);
