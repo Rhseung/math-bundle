@@ -1,11 +1,12 @@
 import base as e
 import polynomial as p
+Polynomial = p.Polynomial
+Symbol = e.Symbol
 
 def main():
-    x = e.Symbol('x')
-    term = 3 * (x ** 2) + 7 * x
-    po = p.Polynomial(term)
+    x = Symbol('x')
+    p = Polynomial(x+1, x)
 
-    print(po)
+    print(p ** 100)
 
 main()

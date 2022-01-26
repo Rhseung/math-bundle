@@ -1,6 +1,5 @@
 import copy
 
-
 class Symbol:
     def __init__(self, name: str):
         self.name = name
@@ -11,6 +10,12 @@ class Symbol:
     def __rmul__(self, num):
         return num * Term(self)
 
+    def __add__(self, num):
+        return Term(self) + num
+
+    def __radd__(self, num):
+        return Term(self) + num
+
     def __pow__(self, num):
         return Term(self) ** num
 
@@ -20,6 +25,13 @@ class Term:
     power = 1
 
     def __init__(self, ctx):
+        # todo float도 해줘야됨
+        if isinstance(ctx, int):
+            # todo 1 같은거 처리 어케하지
+            self.name = 'x'
+            self.coeff = ctx
+            self.power = 0
+
         if isinstance(ctx, Symbol):
             self.name = ctx.name
 
@@ -57,11 +69,15 @@ class Term:
     def __str__(self) -> str:
         return '%d%s^%d' % (self.coeff, self.name, self.power)
 
-
+# todo Tree Form Expression
 class Expression:
     expr = []
 
-    def __init__(self, ctx):
+    def __init__(self, ctx=None):
+        # todo float도 해줘야됨
+        if isinstance(ctx, int):
+            ctx = Term(ctx)
+
         if isinstance(ctx, Symbol):
             ctx = Term(ctx)
 

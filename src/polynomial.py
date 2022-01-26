@@ -1,42 +1,79 @@
 import base
-
+import copy
 
 class Polynomial:
-    coefficients = [0]
+    def __init__(self, formula=None, main_symbol=None):
+        # todo main_symbol이 [x, y] 같이 리스트 타입도 가능케 하기
+        # todo [4xy, 2x^3, 8y^2x^6] => 계수 [4, 2, 8], 지수 [[1,1], [3, 0], [6,2]] 로 저장 방식 바꾸기
 
-    def __init__(self, formula, main_symbol):
+        self.coefficients = [0]
         formula = base.Expression(formula)
 
-        # TODO formula에 symbol이 1개면 그 symbol로 main_symbol을 자동 지정
-        self.main_symbol = main_symbol
+        if main_symbol is not None:
+            # todo formula에 symbol이 1개면 그 symbol로 main_symbol을 자동 지정
+            self.main_symbol = main_symbol
 
-        for term in formula.expr:
-            max_degree = len(self.coefficients) - 1
-            if term.power > max_degree:
-                self.coefficients.extend([0] * (term.power - max_degree))
+            for term in formula.expr:
+                max_degree = len(self.coefficients) - 1
+                if term.power > max_degree:
+                    self.coefficients.extend([0] * (term.power - max_degree))
 
-            self.coefficients[term.power] += term.coeff
+                self.coefficients[term.power] += term.coeff
 
     def __str__(self):
         ret = str()
 
-        for i in range(len(self.coefficients) - 1, 0, -1):
+        for i in range(len(self.coefficients) - 1, -1, -1):
             if self.coefficients[i] == 0:
                 continue
 
-            ret += f'{self.coefficients[i]}{self.main_symbol.name}^{i} + '
+            coeff_str = "" if self.coefficients[i] == 1 and i != 0 else self.coefficients[i]
+            symbol_str = "" if i == 0 else self.main_symbol.name
+            power_str = "" if i == 1 or i == 0 else f"{i}"
+            power_str = power_str.replace('0', '⁰')\
+                .replace('1', '¹')\
+                .replace('2', '²')\
+                .replace('3', '³')\
+                .replace('4', '⁴')\
+                .replace('5', '⁵')\
+                .replace('6', '⁶')\
+                .replace('7', '⁷')\
+                .replace('8', '⁸')\
+                .replace('9', '⁹')
+
+            ret += f'{coeff_str}{symbol_str}{power_str} + '
 
         return ret[:-3]
 
     # operators
     def __add__(self, other):
-        pass
+        if len(self.coefficients) >= len(other.coefficients):
+            ret = copy.deepcopy(self)
+            otherp = copy.deepcopy(other)
+        else:
+            ret = copy.deepcopy(other)
+            otherp = copy.deepcopy(self)
+
+        for i in range(len(otherp.coefficients)):
+            ret.coefficients[i] += otherp.coefficients[i]
+
+        return ret
 
     def __sub__(self, other):
-        pass
+        return self + -other
 
     def __mul__(self, other):
-        pass
+        # todo main_symbol이 다르면 [self.main_symbol, other.main_symbol] 로 main_symbol 정하기
+
+        ret = Polynomial(None, self.main_symbol)
+        sum_degree = (len(self.coefficients) - 1) + (len(other.coefficients) - 1)
+        ret.coefficients = [0] * (sum_degree + 1)
+
+        for i in range(len(self.coefficients)):
+            for j in range(len(other.coefficients)):
+                ret.coefficients[i + j] += self.coefficients[i] * other.coefficients[j]
+
+        return ret
 
     def __truediv__(self, other):
         pass
@@ -47,18 +84,19 @@ class Polynomial:
     def __divmod__(self, other):
         pass
 
-    def __pow__(self, power, modulo=None):
-        pass
+    def __pow__(self, power: int, modulo=None):
+        ret = copy.deepcopy(self)
+
+        for i in range(power - 1):
+            ret *= self
+
+        return ret
 
     def __mod__(self, other):
         pass
 
-    def __pos__(self):
-        pass
-
     def __neg__(self):
-        pass
+        self_copied = copy.deepcopy(self)
+        self_copied.coefficients = list(map(lambda x: -x, self_copied.coefficients))
 
-x = base.Symbol('x')
-p = Polynomial(x ** 2 ** 2 + 3 * x + x, x)
-print(p)
+        return self_copied
