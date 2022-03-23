@@ -3,22 +3,25 @@ import copy
 
 class Polynomial:
     def __init__(self, formula=None, main_symbol=None):
-        # todo main_symbol이 [x, y] 같이 리스트 타입도 가능케 하기
-        # todo [4xy, 2x^3, 8y^2x^6] => 계수 [4, 2, 8], 지수 [[1,1], [3, 0], [6,2]] 로 저장 방식 바꾸기
+        # TODO main_symbol이 [x, y] 같이 리스트 타입도 가능케 하기
+        # TODO [4xy, 2x^3, 8y^2x^6] => 계수 [4, 2, 8], 지수 [[1,1], [3, 0], [6,2]] 로 저장 방식 바꾸기
 
         self.coefficients = [0]
         formula = base.Expression(formula)
 
-        if main_symbol is not None:
-            # todo formula에 symbol이 1개면 그 symbol로 main_symbol을 자동 지정
-            self.main_symbol = main_symbol
+        if main_symbol is None:
+            main_symbol = base.Symbol(formula.expr[0].name)
+        
+        #if isinstance(main_symbol, str): main_symbol = [main_symbol]
+        # TODO formula에 symbol이 1개면 그 symbol로 main_symbol을 자동 지정
+        self.main_symbol = main_symbol
 
-            for term in formula.expr:
-                max_degree = len(self.coefficients) - 1
-                if term.power > max_degree:
-                    self.coefficients.extend([0] * (term.power - max_degree))
+        for term in formula.expr:
+            max_degree = len(self.coefficients) - 1
+            if term.power > max_degree:
+                self.coefficients.extend([0] * (term.power - max_degree))
 
-                self.coefficients[term.power] += term.coeff
+            self.coefficients[term.power] += term.coeff
 
     def __str__(self):
         ret = str()
@@ -63,7 +66,7 @@ class Polynomial:
         return self + -other
 
     def __mul__(self, other):
-        # todo main_symbol이 다르면 [self.main_symbol, other.main_symbol] 로 main_symbol 정하기
+        # TODO main_symbol이 다르면 [self.main_symbol, other.main_symbol] 로 main_symbol 정하기
 
         ret = Polynomial(None, self.main_symbol)
         sum_degree = (len(self.coefficients) - 1) + (len(other.coefficients) - 1)
@@ -100,3 +103,9 @@ class Polynomial:
         self_copied.coefficients = list(map(lambda x: -x, self_copied.coefficients))
 
         return self_copied
+
+    def solve(self, ):
+        pass
+
+    def collect(self):
+        pass
