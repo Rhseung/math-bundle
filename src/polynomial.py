@@ -4,7 +4,7 @@ import copy
 class Polynomial:
     def __init__(self, formula=None, main_symbol=None):
         # TODO main_symbol이 [x, y] 같이 리스트 타입도 가능케 하기
-        # TODO [4xy, 2x^3, 8y^2x^6] => 계수 [4, 2, 8], 지수 [[1,1], [3, 0], [6,2]] 로 저장 방식 바꾸기
+
 
         self.coefficients = [0]
         formula = base.Expression(formula)
