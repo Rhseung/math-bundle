@@ -232,6 +232,6 @@ x, y = Symbols("x, y")
 print(4*x*y + 6*(x**2)*y + 6*x*y - 6*(x**2)*y)
 print(a * b * c)
 print(2*a-a-a+a)
-print(0 + a)    # error
-print(a + 0)    # error
 print(a+b+a+a+b-b)
+# print(0 + a)    # error
+print(a + 0)    # error
